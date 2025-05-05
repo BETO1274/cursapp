@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "243973317631",
+    "project_id": "cursapp-7567a",
+    "storage_bucket": "cursapp-7567a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243973317631:android:f740f0ba9c47a05d783dca",
+        "android_client_info": {
+          "package_name": "com.example.cursapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaai4BgdGS7MjZVZw_DgCobfNKvWnUwJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
