@@ -5,6 +5,7 @@ import '../models/course_model.dart';
 import '../providers/user_provider.dart';
 import '../views/main_scaffold.dart';
 import 'course_units_screen.dart';
+import 'create_course_screen.dart'; // Asegúrate de importar la pantalla de creación
 
 class CompanyCoursesScreen extends StatefulWidget {
   final String companyCode;
@@ -35,6 +36,18 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
 
     return MainScaffold(
       currentIndex: 1,
+      floatingActionButton: FloatingActionButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateCourseScreen(companyCode: widget.companyCode),
+      ),
+    );
+  },
+  child: const Icon(Icons.add),
+  tooltip: 'Crear curso',
+),
       child: Column(
         children: [
           Expanded(

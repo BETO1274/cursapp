@@ -9,7 +9,14 @@ import 'profile_screen.dart';
 class MainScaffold extends StatelessWidget {
   final Widget child;
   final int currentIndex;
-  const MainScaffold({Key? key, required this.child, this.currentIndex = 0}) : super(key: key);
+  final FloatingActionButton? floatingActionButton;
+
+  const MainScaffold({
+    Key? key,
+    required this.child,
+    this.currentIndex = 0,
+    this.floatingActionButton,
+  }) : super(key: key);
 
   void _onTap(BuildContext context, int idx) {
     final code = Provider.of<UserProvider>(context, listen: false).user.companyCode ?? '';
@@ -43,6 +50,7 @@ class MainScaffold extends StatelessWidget {
         ],
       ),
       body: child,
+      floatingActionButton: floatingActionButton,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (i) => _onTap(context, i),

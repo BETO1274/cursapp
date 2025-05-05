@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
 import '../services/course_service.dart';
+import '../services/image_service.dart'; 
 
 class CourseController {
   final CourseService _service = CourseService();
@@ -31,4 +32,10 @@ class CourseController {
   Future<CourseModel?> getById(String id) async {
     return await _service.fetchById(id);
   }
+
+  Future<String> uploadCourseImage(String imagePath, String companyCode, String courseId) async {
+  return await ImageService.uploadCourseImage(companyCode, courseId, imagePath);
+}
+
+
 }

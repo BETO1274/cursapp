@@ -17,6 +17,26 @@ class CourseModel {
     this.enrolledUserIds = const [],
   });
 
+CourseModel copyWith({
+  String? id,
+  String? title,
+  String? description,
+  String? imageUrl,
+  String? companyCode,
+  String? creatorId,
+  List<String>? enrolledUserIds,
+}) {
+  return CourseModel(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    imageUrl: imageUrl ?? this.imageUrl,
+    companyCode: companyCode ?? this.companyCode,
+    creatorId: creatorId ?? this.creatorId,
+    enrolledUserIds: enrolledUserIds ?? this.enrolledUserIds,
+  );
+}
+
   Map<String, dynamic> toMap() {
     return {
       'title': title,

@@ -1,9 +1,11 @@
-// lib/views/create_course_screen.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../controllers/course_controller.dart';
+import '../models/course_model.dart';
+import 'package:uuid/uuid.dart';
+
 
 class CreateCourseScreen extends StatefulWidget {
   final String companyCode;
@@ -22,23 +24,36 @@ class _CreateCourseScreenState extends State<CreateCourseScreen> {
     final file = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (file != null) setState(() => _imagePath = file.path);
   }
-
-  void _save() async {
-    if (_desc.text.isEmpty || _imagePath == null) {
-      setState(() => _error = 'Faltan campos');
-      return;
-    }
-    try {
-      await _ctrl.createCourse(
-        companyCode: widget.companyCode,
-        description: _desc.text,
-        imagePath: _imagePath!,
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      setState(() => _error = e.toString());
-    }
+void _save() async {
+  if (_desc.text.isEmpty || _imagePath == null) {
+    setState(() => _error = 'Faltan campos');
+    return;
   }
+  try {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw Exception("Usuario no autenticado");
+
+    // Generar un ID único
+    final courseId = const Uuid().v4();
+
+    // Subir imagen y obtener URL
+    final imageUrl = await _ctrl.uploadCourseImage(_imagePath!, widget.companyCode, courseId);
+
+    final course = CourseModel(
+      id: courseId,
+      title: _desc.text,
+      description: _desc.text,
+      imageUrl: imageUrl,
+      companyCode: widget.companyCode,
+      creatorId: userId,
+    );
+
+    await _ctrl.createCourse(course);
+    Navigator.pop(context);
+  } catch (e) {
+    setState(() => _error = e.toString());
+  }
+}
 
   @override
   Widget build(BuildContext context) {
