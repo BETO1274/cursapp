@@ -5,7 +5,8 @@ import '../models/course_model.dart';
 import '../providers/user_provider.dart';
 import '../views/main_scaffold.dart';
 import 'course_units_screen.dart';
-import 'create_course_screen.dart'; // Asegúrate de importar la pantalla de creación
+import 'create_course_screen.dart';
+import 'create_unit_screen.dart'; // Importamos la pantalla para crear unidad
 
 class CompanyCoursesScreen extends StatefulWidget {
   final String companyCode;
@@ -37,17 +38,17 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
     return MainScaffold(
       currentIndex: 1,
       floatingActionButton: FloatingActionButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CreateCourseScreen(companyCode: widget.companyCode),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CreateCourseScreen(companyCode: widget.companyCode),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Crear curso',
       ),
-    );
-  },
-  child: const Icon(Icons.add),
-  tooltip: 'Crear curso',
-),
       child: Column(
         children: [
           Expanded(
@@ -66,14 +67,18 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
 
                 return Card(
                   elevation: 4,
-                  child: ListTile(
-                    leading: course.imageUrl != null
-                        ? Image.network(course.imageUrl!, width: 60, height: 60, fit: BoxFit.cover)
-                        : const Icon(Icons.book),
-                    title: Text(course.description),
-                    trailing: isCreator
-                        ? ElevatedButton(
-                            child: const Text('Editar'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        course.imageUrl != null
+                            ? Image.network(course.imageUrl!, width: 60, height: 60, fit: BoxFit.cover)
+                            : const Icon(Icons.book, size: 60),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(course.description)),
+                        const SizedBox(width: 10),
+                        if (isCreator) ...[
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -83,16 +88,35 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                                 ),
                               );
                             },
-                          )
-                        : ElevatedButton(
-                            child: const Text('Matricularse'),
+                            child: const Text('Editar'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CreateUnitScreen(
+                                    courseId: course.id,
+                                    companyCode: widget.companyCode,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text('Agregar unidad'),
+                          ),
+                        ] else
+                          ElevatedButton(
                             onPressed: () async {
                               await _courseController.enroll(currentUserId, course.id);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Matriculado exitosamente')),
                               );
                             },
+                            child: const Text('Matricularse'),
                           ),
+                      ],
+                    ),
                   ),
                 );
               },

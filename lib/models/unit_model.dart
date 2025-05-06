@@ -1,22 +1,30 @@
 class UnitModel {
   final String id;
-  final String courseId;
-  final String title;
-  final String pdfUrl;
+  final String name;
+  final String description;
+  final List<String> pdfUrls;
 
-  UnitModel({required this.id, required this.courseId, required this.title, required this.pdfUrl});
+  UnitModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.pdfUrls,
+  });
 
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'courseId': courseId,
-    'title': title,
-    'pdfUrl': pdfUrl,
-  };
+  factory UnitModel.fromMap(String id, Map<String, dynamic> data) {
+    return UnitModel(
+      id: id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      pdfUrls: List<String>.from(data['pdfUrls'] ?? []),
+    );
+  }
 
-  static UnitModel fromMap(Map<String, dynamic> map) => UnitModel(
-    id: map['id'],
-    courseId: map['courseId'],
-    title: map['title'],
-    pdfUrl: map['pdfUrl'],
-  );
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'pdfUrls': pdfUrls,
+    };
+  }
 }
