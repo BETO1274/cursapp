@@ -7,7 +7,8 @@ import 'main_scaffold.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final String courseId;
-  const CourseDetailScreen({Key? key, required this.courseId}) : super(key: key);
+  const CourseDetailScreen({Key? key, required this.courseId})
+    : super(key: key);
 
   @override
   State<CourseDetailScreen> createState() => _CourseDetailScreenState();
@@ -33,47 +34,53 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   Widget build(BuildContext context) {
     return MainScaffold(
       currentIndex: 1,
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _units.length,
-                    itemBuilder: (_, i) {
-                      final u = _units[i];
-                      return ListTile(
-                        title: Text(u.title),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.picture_as_pdf),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => UnitViewerScreen(pdfUrl: u.pdfUrl),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
+      child:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _units.length,
+                      itemBuilder: (_, i) {
+                        final u = _units[i];
+                        return ListTile(
+                          title: Text(u.title),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.picture_as_pdf),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => UnitViewerScreen(pdfUrl: u.pdfUrl),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text('Agregar Unidad'),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CreateUnitScreen(courseId: widget.courseId),
-                      ),
-                    ).then((_) => _loadUnits()),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.add),
+                      label: const Text('Agregar Unidad'),
+                      onPressed:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => CreateUnitScreen(
+                                    courseId: widget.courseId,
+                                  ),
+                            ),
+                          ).then((_) => _loadUnits()),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
     );
   }
 }

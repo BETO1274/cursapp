@@ -6,6 +6,7 @@ import 'main_scaffold.dart';
 
 class MyCoursesScreen extends StatefulWidget {
   const MyCoursesScreen({super.key});
+
   @override
   State<MyCoursesScreen> createState() => _MyCoursesScreenState();
 }
@@ -37,20 +38,86 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _courses.isEmpty
-              ? const Center(child: Text('No estás matriculado en ningún curso'))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: _courses.length,
-                  itemBuilder: (_, i) {
-                    final c = _courses[i];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: Image.network(c.imageUrl, width: 60, fit: BoxFit.cover),
-                        title: Text(c.description),
-                      ),
-                    );
-                  },
+              ? const Center(
+                  child: Text(
+                    'No estás matriculado en ningún curso',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
+                    itemCount: _courses.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemBuilder: (_, i) {
+                      final c = _courses[i];
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 5,
+                        child: InkWell(
+                          onTap: () {
+                            // Acción al tocar el curso
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: c.imageUrl.isNotEmpty
+                                      ? Image.network(
+                                          c.imageUrl,
+                                          width: double.infinity,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(
+                                          width: double.infinity,
+                                          height: 100,
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.book, size: 50),
+                                        ),
+                                ),
+                                const SizedBox(height: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        c.description,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Código: ${c.id}',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
     );
   }
