@@ -1,115 +1,139 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../controllers/course_controller.dart';
 import '../models/course_model.dart';
-import '../services/course_service.dart';
-import '../services/image_service.dart';
+import 'package:uuid/uuid.dart';
 
-class EditCourseScreen extends StatefulWidget {
-  final CourseModel course;
-
-  const EditCourseScreen({super.key, required this.course});
+class CreateCourseScreen extends StatefulWidget {
+  final String companyCode;
+  const CreateCourseScreen({Key? key, required this.companyCode}) : super(key: key);
 
   @override
-  State<EditCourseScreen> createState() => _EditCourseScreenState();
+  State<CreateCourseScreen> createState() => _CreateCourseScreenState();
 }
 
-class _EditCourseScreenState extends State<EditCourseScreen> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _descriptionController;
-  File? _newImage;
-  bool _loading = false;
+class _CreateCourseScreenState extends State<CreateCourseScreen> {
+  final _desc = TextEditingController();
+  String? _imagePath, _error;
+  final _ctrl = CourseController();
 
-  final _service = CourseService();
-
-  @override
-  void initState() {
-    super.initState();
-    _descriptionController = TextEditingController(text: widget.course.description);
+  Future<void> _pick() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file != null) setState(() => _imagePath = file.path);
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _newImage = File(picked.path);
-      });
+  void _save() async {
+    if (_desc.text.isEmpty || _imagePath == null) {
+      setState(() => _error = 'Faltan campos');
+      return;
     }
-  }
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) throw Exception("Usuario no autenticado");
 
-  Future<void> _saveChanges() async {
-    if (!_formKey.currentState!.validate()) return;
+      final courseId = const Uuid().v4();
+      final imageUrl = await _ctrl.uploadCourseImage(_imagePath!, widget.companyCode, courseId);
 
-    setState(() => _loading = true);
-
-    String imageUrl = widget.course.imageUrl;
-
-    if (_newImage != null) {
-      imageUrl = await ImageService.uploadCourseImage(
-        widget.course.companyCode,
-        widget.course.id,
-        _newImage!.path,
+      final course = CourseModel(
+        id: courseId,
+        title: _desc.text,
+        description: _desc.text,
+        imageUrl: imageUrl,
+        companyCode: widget.companyCode,
+        creatorId: userId,
       );
-    }
 
-    final updatedCourse = CourseModel(
-      id: widget.course.id,
-      companyCode: widget.course.companyCode,
-      description: _descriptionController.text.trim(),
-      imageUrl: imageUrl,
-      creatorId: widget.course.creatorId,
-    );
-
-    await _service.update(updatedCourse);
-
-    setState(() => _loading = false);
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Curso actualizado")),
-      );
+      await _ctrl.createCourse(course);
       Navigator.pop(context);
+    } catch (e) {
+      setState(() => _error = e.toString());
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Editar Curso")),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    if (_newImage != null)
-                      Image.file(_newImage!, height: 200, fit: BoxFit.cover)
-                    else if (widget.course.imageUrl.isNotEmpty)
-                      Image.network(widget.course.imageUrl, height: 200, fit: BoxFit.cover),
-                    const SizedBox(height: 12),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.image),
-                      label: const Text("Cambiar Imagen"),
-                      onPressed: _pickImage,
+      appBar: AppBar(title: const Text('Crear Curso')),
+      body: Center(  // Centra todo el contenido
+        child: SingleChildScrollView(  // Permite desplazar el contenido si es necesario
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,  // Permite que el contenido se ajuste a su tamaño
+              children: [
+                // Descripción con estilo bonito
+                TextField(
+                  controller: _desc,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Descripción',
+                    hintText: 'Introduce la descripción del curso',
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Descripción'),
-                      validator: (value) => value == null || value.isEmpty ? 'Requerido' : null,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _saveChanges,
-                      child: const Text("Guardar Cambios"),
-                    ),
-                  ],
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+
+                // Botón de seleccionar imagen con fondo blanco y texto negro
+                ElevatedButton(
+                  onPressed: _pick,
+                  child: const Text('Seleccionar imagen', style: TextStyle(color: Colors.black)),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black, backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: Colors.black),
+                  ),
+                ),
+                if (_imagePath != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _imagePath!,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ],
+
+                // Mensaje de error
+                if (_error != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                // Botón de guardar curso con fondo blanco y texto negro
+                ElevatedButton(
+                  onPressed: _save,
+                  child: const Text('Guardar curso', style: TextStyle(color: Colors.black)),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black, backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: Colors.black),
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }
