@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../controllers/course_controller.dart';
 import '../models/course_model.dart';
 import 'main_scaffold.dart';
+import 'course_units_screen.dart';
 
 class MyCoursesScreen extends StatefulWidget {
   const MyCoursesScreen({super.key});
@@ -63,7 +64,16 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                         elevation: 5,
                         child: InkWell(
                           onTap: () {
-                            // Acción al tocar el curso
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CourseUnitsScreen(
+                                  courseId: c.id,
+                                  companyCode: c.companyCode,
+                                  courseName: c.title,
+                                ),
+                              ),
+                            );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(12),
@@ -87,28 +97,25 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                                         ),
                                 ),
                                 const SizedBox(height: 8),
+                                Text(
+                                  c.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        c.description,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Código: ${c.id}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    c.description,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],

@@ -5,44 +5,33 @@ import 'package:uuid/uuid.dart';
 import '../models/unit_model.dart';
 
 class UnitService {
-  final _db = FirebaseFirestore.instance;
-  final _storage = FirebaseStorage.instance;
-  final _uuid = const Uuid();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  /// Crea una unidad dentro de courses/{courseId}/units
-  Future<void> createUnit({
-    required String courseId,
-    required String title,
-    required String pdfPath,
-  }) async {
-    final unitId = _uuid.v4();
-    // 1) Subir PDF
-    final ref = _storage.ref().child('courses/$courseId/units/$unitId.pdf');
-    await ref.putFile(File(pdfPath));
-    final pdfUrl = await ref.getDownloadURL();
-    // 2) Guardar metadata en Firestore
-    final unit = UnitModel(
-      id: unitId,
-      courseId: courseId,
-      title: title,
-      pdfUrl: pdfUrl,
-    );
-    await _db
-        .collection('courses')
-        .doc(courseId)
-        .collection('units')
-        .doc(unitId)
-        .set(unit.toMap());
+  Future<void> addUnit(String courseId, UnitModel unit) async {
+    final ref = _firestore.collection('courses').doc(courseId).collection('units').doc(unit.id);
+    await ref.set(unit.toMap());
   }
 
-  /// Trae todas las unidades de un curso
-  Future<List<UnitModel>> fetchUnits(String courseId) async {
-    final snap = await _db
+  Future<List<UnitModel>> getUnits(String courseId) async {
+    final snapshot = await _firestore
         .collection('courses')
         .doc(courseId)
         .collection('units')
-        .orderBy('title')
         .get();
-    return snap.docs.map((d) => UnitModel.fromMap(d.data())).toList();
+
+    return snapshot.docs
+        .map((doc) => UnitModel.fromMap(doc.id, doc.data()))
+        .toList();
+  }
+
+  Future<String> uploadPdf(String companyCode, String courseId, String unitId, File pdfFile) async {
+    final fileName = const Uuid().v4();
+    final ref = _storage
+        .ref()
+        .child('courses/$companyCode/$courseId/$unitId/$fileName.pdf');
+
+    await ref.putFile(pdfFile);
+    return await ref.getDownloadURL();
   }
 }

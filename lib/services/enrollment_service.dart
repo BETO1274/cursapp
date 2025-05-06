@@ -8,7 +8,7 @@ class EnrollmentService {
     required String userId,
     required String courseId,
   }) {
-    // Guardamos dentro de users/{userId}/enrollments/{courseId}
+    
     return _db
       .collection('users')
       .doc(userId)
@@ -20,7 +20,7 @@ class EnrollmentService {
       });
   }
 
-  /// Opcional: obtiene lista de courseId en que el usuario está matriculado
+  /// courseId en que el usuario está matriculado
   Future<List<String>> getUserEnrollments(String userId) async {
     final snap = await _db
       .collection('users')

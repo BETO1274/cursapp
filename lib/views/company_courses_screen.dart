@@ -6,6 +6,7 @@ import '../providers/user_provider.dart';
 import '../views/main_scaffold.dart';
 import 'course_units_screen.dart';
 import 'create_course_screen.dart';
+import 'create_unit_screen.dart';
 
 class CompanyCoursesScreen extends StatefulWidget {
   final String companyCode;
@@ -58,7 +59,7 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: 0.70,
+                  childAspectRatio: 0.75,
                 ),
                 itemBuilder: (context, index) {
                   final course = _courses[index];
@@ -67,100 +68,117 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                   return Card(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 6,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CourseUnitsScreen(
-                              course: course,
-                              isCreator: isCreator,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: course.imageUrl != null && course.imageUrl!.isNotEmpty
+                                ? Image.network(
+                                    course.imageUrl!,
+                                    width: double.infinity,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(
+                                    width: double.infinity,
+                                    height: 100,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.book, size: 50),
+                                  ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  course.description,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'ID: ${course.id}',
+                                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                ),
+                                const Spacer(),
+                                if (isCreator) ...[
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.indigo,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CourseUnitsScreen(
+                                            courseId: course.id,
+                                            companyCode: course.companyCode,
+                                            courseName: course.title,
+                                            isCreator: true,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('Editar', style: TextStyle(fontSize: 13)),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepOrange,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CreateUnitScreen(
+                                            courseId: course.id,
+                                            companyCode: widget.companyCode,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('Agregar unidad', style: TextStyle(fontSize: 13)),
+                                  ),
+                                ] else
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      await _courseController.enroll(currentUserId, course.id);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Matriculado exitosamente')),
+                                      );
+                                    },
+                                    child: const Text('Matricularse', style: TextStyle(fontSize: 13)),
+                                  ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: course.imageUrl != null && course.imageUrl!.isNotEmpty
-                                  ? Image.network(
-                                      course.imageUrl!,
-                                      width: double.infinity,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      width: double.infinity,
-                                      height: 100,
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.book, size: 50),
-                                    ),
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    course.description,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'ID: ${course.id}',
-                                    style: const TextStyle(fontSize: 13, color: Colors.grey),
-                                  ),
-                                  const Spacer(),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: isCreator ? Colors.indigo : Colors.green,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 8), // reducido
-                                        minimumSize: const Size(0, 36), // altura mínima menor
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        if (isCreator) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => CourseUnitsScreen(
-                                                course: course,
-                                                isCreator: true,
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          await _courseController.enroll(currentUserId, course.id);
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Matriculado exitosamente')),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        isCreator ? 'Editar' : 'Matricularse',
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                   );
