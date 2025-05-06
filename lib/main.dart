@@ -27,7 +27,7 @@ class CursApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.blue),
         initialRoute: '/login',
         routes: {
-          '/login': (context) => const LoginScreen(),        // Ya funciona con const
+          '/login': (context) => const LoginScreen(),    
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const MyCoursesScreen(),
           '/company-courses': (context) {

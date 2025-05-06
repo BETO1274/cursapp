@@ -6,7 +6,7 @@ import '../providers/user_provider.dart';
 import '../views/main_scaffold.dart';
 import 'course_units_screen.dart';
 import 'create_course_screen.dart';
-import 'create_unit_screen.dart'; // Importamos la pantalla para crear unidad
+import 'create_unit_screen.dart';
 
 class CompanyCoursesScreen extends StatefulWidget {
   final String companyCode;
@@ -42,7 +42,8 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => CreateCourseScreen(companyCode: widget.companyCode),
+              builder:
+                  (_) => CreateCourseScreen(companyCode: widget.companyCode),
             ),
           );
         },
@@ -72,7 +73,12 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                     child: Row(
                       children: [
                         course.imageUrl != null
-                            ? Image.network(course.imageUrl!, width: 60, height: 60, fit: BoxFit.cover)
+                            ? Image.network(
+                              course.imageUrl!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            )
                             : const Icon(Icons.book, size: 60),
                         const SizedBox(width: 10),
                         Expanded(child: Text(course.description)),
@@ -83,8 +89,13 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      CourseUnitsScreen(course: course, isCreator: true),
+                                  builder:
+                                      (_) => CourseUnitsScreen(
+                                        courseId: course.id,
+                                        companyCode: course.companyCode,
+                                        courseName: course.title,
+                                        isCreator: true,
+                                      ),
                                 ),
                               );
                             },
@@ -96,10 +107,11 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => CreateUnitScreen(
-                                    courseId: course.id,
-                                    companyCode: widget.companyCode,
-                                  ),
+                                  builder:
+                                      (_) => CreateUnitScreen(
+                                        courseId: course.id,
+                                        companyCode: widget.companyCode,
+                                      ),
                                 ),
                               );
                             },
@@ -108,9 +120,14 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                         ] else
                           ElevatedButton(
                             onPressed: () async {
-                              await _courseController.enroll(currentUserId, course.id);
+                              await _courseController.enroll(
+                                currentUserId,
+                                course.id,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Matriculado exitosamente')),
+                                const SnackBar(
+                                  content: Text('Matriculado exitosamente'),
+                                ),
                               );
                             },
                             child: const Text('Matricularse'),

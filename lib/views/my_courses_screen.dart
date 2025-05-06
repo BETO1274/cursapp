@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../controllers/course_controller.dart';
 import '../models/course_model.dart';
 import 'main_scaffold.dart';
+import 'course_units_screen.dart';
 
 class MyCoursesScreen extends StatefulWidget {
   const MyCoursesScreen({super.key});
@@ -47,7 +48,20 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: ListTile(
                         leading: Image.network(c.imageUrl, width: 60, fit: BoxFit.cover),
-                        title: Text(c.description),
+                        title: Text(c.title),
+                        subtitle: Text(c.description),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CourseUnitsScreen(
+                                courseId: c.id,
+                                companyCode: c.companyCode,
+                                courseName: c.title,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },

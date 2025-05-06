@@ -51,23 +51,20 @@ Future<void> removePdfUrl(String companyCode, String courseId, String unitId, St
         'pdfUrls': FieldValue.arrayRemove([pdfUrl])
       });
 
-  // También eliminamos el archivo de Firebase Storage
+
   final ref = _storage.refFromURL(pdfUrl);
   await ref.delete();
 }
 
 Future<void> deleteUnit(String companyCode, String courseId, UnitModel unit) async {
-  // 1. Eliminar cada PDF de Firebase Storage
   for (String url in unit.pdfUrls) {
     try {
       final ref = _storage.refFromURL(url);
       await ref.delete();
-    } catch (e) {
-      // Ignorar errores por archivos no encontrados
-    }
+    // ignore: empty_catches
+    } catch (e) {}
   }
 
-  // 2. Eliminar documento de Firestore
   await _firestore
       .collection('companies')
       .doc(companyCode)
