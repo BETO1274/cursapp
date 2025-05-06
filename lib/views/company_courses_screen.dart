@@ -81,9 +81,9 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: course.imageUrl != null && course.imageUrl!.isNotEmpty
+                                child: course.imageUrl.isNotEmpty
                                     ? Image.network(
-                                        course.imageUrl!,
+                                        course.imageUrl,
                                         width: double.infinity,
                                         height: 100,
                                         fit: BoxFit.cover,
@@ -114,7 +114,7 @@ class _CompanyCoursesScreenState extends State<CompanyCoursesScreen> {
                               const Spacer(),
                               if (isCreator) ...[
                                 _buildButton(
-                                  label: 'Editar',
+                                  label: 'Visualizar',
                                   color: const Color.fromARGB(255, 231, 231, 231),
                                   onPressed: () {
                                     Navigator.push(
