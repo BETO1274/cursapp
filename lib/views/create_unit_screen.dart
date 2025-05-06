@@ -137,6 +137,37 @@ class _CreateUnitScreenState extends State<CreateUnitScreen> {
               child: ExpansionTile(
                 title: Text(unit.name),
                 subtitle: Text(unit.description),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('¿Eliminar unidad?'),
+                        content: Text('¿Deseas eliminar la unidad "${unit.name}" y todos sus PDFs?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true) {
+                      await _unitController.deleteUnit(
+                        widget.companyCode,
+                        widget.courseId,
+                        unit,
+                      );
+                      _loadUnits();
+                    }
+                  },
+                ),
                 children: [
                   ...unit.pdfUrls.map((pdfUrl) => ListTile(
                         leading: const Icon(Icons.picture_as_pdf),
