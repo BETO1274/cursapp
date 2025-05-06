@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../controllers/unit_controller.dart';
 import '../models/unit_model.dart';
 import '../providers/user_provider.dart';
+import '../views/main_scaffold.dart';
 
 class CreateUnitScreen extends StatefulWidget {
   final String courseId;
@@ -134,8 +135,10 @@ class _CreateUnitScreenState extends State<CreateUnitScreen> {
         const Text('Unidades creadas:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         ..._existingUnits.map((unit) => Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 4,
               child: ExpansionTile(
-                title: Text(unit.name),
+                title: Text(unit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(unit.description),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
@@ -221,33 +224,50 @@ class _CreateUnitScreenState extends State<CreateUnitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Crear Unidad')),
-      body: SingleChildScrollView(
+    return MainScaffold(
+      currentIndex: 1,
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            const Text(
+              'Crear nueva unidad',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nombre de la unidad'),
+              decoration: const InputDecoration(
+                labelText: 'Nombre de la unidad',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 10),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Descripción'),
+              decoration: const InputDecoration(
+                labelText: 'Descripción',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 10),
             ElevatedButton.icon(
               onPressed: _pickPdf,
               icon: const Icon(Icons.picture_as_pdf),
               label: const Text('Seleccionar PDFs'),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 255, 255, 255)),
             ),
             _buildPdfPreview(),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _createUnit,
               child: const Text('Guardar Unidad'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              ),
             ),
-            const Divider(height: 30),
+            const Divider(height: 40),
             _buildExistingUnits(),
           ],
         ),
